@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var secondsPassed = 0.0
     
     let tickPlayer = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "AnalogTimerTick", ofType: "aac")!))
+    let gongSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "Gong", ofType: "mp3")!))
     
     var body: some View {
         TabView {
@@ -125,7 +126,10 @@ struct ContentView: View {
                 Link("Bushikan karate-dō (facebook)", destination: URL(string: "fb://profile/1288067101336760")!)
                     .padding()
                 
-                Spacer() // Tilføj en mellemrum for at adskille indholdet fra tab baren
+                Spacer()
+                
+                Link("Source code (github)", destination: URL(string: "https://github.com/jenslohmann/Tabata")!)
+                    .padding()
                 
                 Button("iOS Settings") {
                     openAppSettings()
@@ -160,6 +164,7 @@ struct ContentView: View {
                 } else {
                     secondsPassed = 0.0
                     isTimerRunning = false
+                    gongSound.play()
                 }
             }
         } else {
