@@ -8,9 +8,20 @@ struct ContentView: View {
     @State private var hasLeadIn = true
     @State private var isTimerRunning = false
     @State private var secondsPassed = 0.0
+    @State private var nextSession = 0.0
     
+    // From; https://www.youtube.com/watch?v=wgOwzF0Y2yI
     let tickPlayer = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "AnalogTimerTick", ofType: "aac")!))
+    // From: https://www.youtube.com/watch?v=VaN5aiO3Qcg
     let gongSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "Gong", ofType: "mp3")!))
+    // From: https://www.youtube.com/watch?v=vmS67wmynrQ
+    let whistleSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "Whistle", ofType: "mp3")!))
+
+    let ichiSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "ichi", ofType: "aac")!))
+    let niSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "ni", ofType: "aac")!))
+    let sanSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "san", ofType: "aac")!))
+    let yonSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "yon", ofType: "aac")!))
+
     
     var body: some View {
         TabView {
@@ -154,9 +165,37 @@ struct ContentView: View {
     func startTimer() {
         if isTimerRunning {
             let deadline = DispatchTime.now() + .milliseconds(100)
-            if(abs(secondsPassed - round(secondsPassed)) < 0.05 && isTimerRunning) {
+            if(secondsPassed == 0.0) {
+                nextSession = hasLeadIn ? 5.0 : (workoutTime + restTime)
+            }
+            var thisRestTime = restTime
+            if(hasLeadIn && secondsPassed < 5.0) {
+                thisRestTime = 5.0
+            }
+
+            if(abs(nextSession - secondsPassed - thisRestTime) < 0.05) {
+                whistleSound.play()
+            }
+            if(abs(nextSession - secondsPassed - 4.0) < 0.05) {
+                yonSound.play()
+            }
+            if(abs(nextSession - secondsPassed - 3.0) < 0.05) {
+                sanSound.play()
+            }
+            if(abs(nextSession - secondsPassed - 2.0) < 0.05) {
+                niSound.play()
+            }
+            if(abs(nextSession - secondsPassed - 1.0) < 0.05) {
+                ichiSound.play()
+            }
+            if(abs(nextSession - secondsPassed) < 0.05) {
+                nextSession += workoutTime + restTime
+                whistleSound.play()
+            }
+            if(secondsPassed < nextSession - thisRestTime - 0.05 && abs(secondsPassed - round(secondsPassed)) < 0.05) {
                 playTickSound()
             }
+
             DispatchQueue.main.asyncAfter(deadline: deadline) {
                 if secondsPassed < total() {
                     secondsPassed += 0.1
@@ -164,6 +203,7 @@ struct ContentView: View {
                 } else {
                     secondsPassed = 0.0
                     isTimerRunning = false
+                    tickPlayer.stop()
                     gongSound.play()
                 }
             }
