@@ -6,10 +6,19 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 @main
 struct TabataApp: App {
     @State var showSplash = true
+    
+    init() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback)
+        } catch {
+            print("Fejl ved indstilling af AVAudioSession-kategori: \(error.localizedDescription)")
+        }
+    }
     
     var body: some Scene {
         WindowGroup {
