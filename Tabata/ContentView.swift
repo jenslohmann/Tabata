@@ -163,6 +163,8 @@ struct ContentView: View {
     }
     
     func startTimer() {
+        UIApplication.shared.isIdleTimerDisabled = isTimerRunning
+
         if isTimerRunning {
             let deadline = DispatchTime.now() + .milliseconds(100)
             if(secondsPassed == 0.0) {
@@ -197,14 +199,17 @@ struct ContentView: View {
             }
 
             DispatchQueue.main.asyncAfter(deadline: deadline) {
-                if secondsPassed < total() {
-                    secondsPassed += 0.1
-                    startTimer()
-                } else {
-                    secondsPassed = 0.0
-                    isTimerRunning = false
-                    tickPlayer.stop()
-                    gongSound.play()
+                // This is dispatched and is running 0.1s after the call to startTimer(). The timer can have been stopped since then.
+                if(isTimerRunning) {
+                    if secondsPassed < total() {
+                        secondsPassed += 0.1
+                        startTimer()
+                    } else {
+                        secondsPassed = 0.0
+                        isTimerRunning = false
+                        tickPlayer.stop()
+                        gongSound.play()
+                    }
                 }
             }
         } else {
@@ -218,6 +223,7 @@ struct ContentView: View {
     
     func resetTimer() {
         isTimerRunning = false
+        startTimer() // Den skal vist omdøbes
         secondsPassed = 0.0
     }
     
