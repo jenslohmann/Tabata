@@ -5,6 +5,14 @@
 ## User settings
 xcuserdata/
 
+*.aac
+*.mp3
+*.heic
+*.png
+*.pxd
+*.ai
+*.pdf
+
 ## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
 *.xcscmblueprint
 *.xccheckout
@@ -93,4 +101,3 @@ iOSInjectionProject/
 __MACOSX
 
 .idea
-
