@@ -9,19 +9,8 @@ struct ContentView: View {
     @State private var isTimerRunning = false
     @State private var secondsPassed = 0.0
     @State private var nextSession = 0.0
-    
-    // From; https://www.youtube.com/watch?v=wgOwzF0Y2yI
-    let tickPlayer = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "AnalogTimerTick", ofType: "aac")!))
-    // From: https://www.youtube.com/watch?v=VaN5aiO3Qcg
-    let gongSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "Gong", ofType: "mp3")!))
-    // From: https://www.youtube.com/watch?v=vmS67wmynrQ
-    let whistleSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "Whistle", ofType: "mp3")!))
-
-    let ichiSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "ichi", ofType: "aac")!))
-    let niSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "ni", ofType: "aac")!))
-    let sanSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "san", ofType: "aac")!))
-    let yonSound = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: Bundle.main.path(forResource: "yon", ofType: "aac")!))
-
+    @State private var beepOnly = false
+    private var play = SoundPlayer()
     
     var body: some View {
         TabView {
@@ -45,7 +34,7 @@ struct ContentView: View {
                 }
                 .padding()
                 
-                SegmentedProgressBar(hasLeadIn: hasLeadIn, workoutTime: workoutTime, restTime: restTime, current: $secondsPassed, sessions: numberOfSessions, isTimerRunning: $isTimerRunning)
+                SegmentedProgressBar(hasLeadIn: hasLeadIn, workoutTime: workoutTime, restTime: restTime, current: $secondsPassed, sessions: numberOfSessions)
                     .frame(height: 20)
                     .padding()
                 
@@ -127,38 +116,10 @@ struct ContentView: View {
                 Label("Japanese", systemImage: "brain")
             }
             
-            VStack {
-                Text("Setup")
-                    .padding()
-                
-                Link("Bushikan karate-dō (web)", destination: URL(string: "https://bushikan.dk/")!)
-                    .padding()
-                
-                Link("Bushikan karate-dō (facebook)", destination: URL(string: "fb://profile/1288067101336760")!)
-                    .padding()
-                
-                Spacer()
-                
-                Link("Source code (github)", destination: URL(string: "https://github.com/jenslohmann/Tabata")!)
-                    .padding()
-                
-                Button("iOS Settings") {
-                    openAppSettings()
-                }.padding()
-            }
-            .tabItem {
-                Label("Setup", systemImage: "gear")
-            }
-        }
-    }
-    
-    func openAppSettings() {
-        guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
-            return
-        }
-        
-        if UIApplication.shared.canOpenURL(settingsURL) {
-            UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+            SetupView(soundPlayer: play)
+                .tabItem {
+                    Label("Setup", systemImage: "gear")
+                }
         }
     }
     
@@ -176,26 +137,26 @@ struct ContentView: View {
             }
 
             if(abs(nextSession - secondsPassed - thisRestTime) < 0.05) {
-                whistleSound.play()
+                play.whistle()
             }
             if(abs(nextSession - secondsPassed - 4.0) < 0.05) {
-                yonSound.play()
+                play.yon()
             }
             if(abs(nextSession - secondsPassed - 3.0) < 0.05) {
-                sanSound.play()
+                play.san()
             }
             if(abs(nextSession - secondsPassed - 2.0) < 0.05) {
-                niSound.play()
+                play.ni()
             }
             if(abs(nextSession - secondsPassed - 1.0) < 0.05) {
-                ichiSound.play()
+                play.ichi()
             }
             if(abs(nextSession - secondsPassed) < 0.05) {
                 nextSession += workoutTime + restTime
-                whistleSound.play()
+                play.whistle()
             }
             if(secondsPassed < nextSession - thisRestTime - 0.05 && abs(secondsPassed - round(secondsPassed)) < 0.05) {
-                playTickSound()
+                play.tick()
             }
 
             DispatchQueue.main.asyncAfter(deadline: deadline) {
@@ -207,18 +168,14 @@ struct ContentView: View {
                     } else {
                         secondsPassed = 0.0
                         isTimerRunning = false
-                        tickPlayer.stop()
-                        gongSound.play()
+                        play.stopTick()
+                        play.gong()
                     }
                 }
             }
         } else {
-            tickPlayer.stop()
+            play.stopTick()
         }
-    }
-    
-    func playTickSound() {
-        tickPlayer.play()
     }
     
     func resetTimer() {

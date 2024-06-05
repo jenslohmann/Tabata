@@ -14,7 +14,6 @@ struct SegmentedProgressBar: View {
     var restTime: Double
     @Binding var current: Double
     var sessions: Int
-    @Binding var isTimerRunning: Bool
     
     var body: some View {
         ZStack {
