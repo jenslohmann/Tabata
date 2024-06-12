@@ -38,7 +38,7 @@ struct ContentView: View {
                     .frame(height: 20)
                     .padding()
                 
-                Text("Total time: \(String(format: "%1.f", total()))s")
+                Text("Total time: \(inMinsAndSecs(seconds: Int(total())))")
                     .font(.largeTitle)
                     .padding()
                 
@@ -236,6 +236,12 @@ struct ContentView: View {
         }
         
         return 20.0
+    }
+    
+    func inMinsAndSecs(seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        return String(format: "%dm%02ds", minutes, remainingSeconds)
     }
 }
 
