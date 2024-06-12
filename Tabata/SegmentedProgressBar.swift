@@ -26,9 +26,14 @@ struct SegmentedProgressBar: View {
                                    height: segmentHeight(for: index))
                     }
                 }
-                Rectangle()
-                    .frame(width: current / total() * geometry.size.width, height: 20)
-                    .foregroundColor(Color.gray).opacity(0.5)
+                HStack(spacing: 0) {
+                    Rectangle()
+                        .frame(width: max(0, current / total() * geometry.size.width - 2), height: 20)
+                        .foregroundColor(Color.gray).opacity(0.5)
+                    Rectangle()
+                        .frame(width: 2, height: 20)
+                        .foregroundColor(Color.black)
+                }
             }
         }
     }
