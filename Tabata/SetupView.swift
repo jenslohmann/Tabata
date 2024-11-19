@@ -23,6 +23,10 @@ struct SetupView: View {
                     .tint(Color.red)
             }.padding(.vertical, 5).padding(.horizontal, nil)
             
+            Button("Save to iCloud") {
+                saveToICloud()
+            }.padding()
+            
             Link("Bushikan karate-dō (web)", destination: URL(string: "https://bushikan.dk/")!)
                 .padding()
             
@@ -38,6 +42,13 @@ struct SetupView: View {
                 openAppSettings()
             }.padding()
         }
+    }
+    
+    func saveToICloud() {
+        let configuration = Configuration()
+        configuration.beepOnly = soundPlayer.beepOnly
+        
+        configuration.write()
     }
     
     func openAppSettings() {

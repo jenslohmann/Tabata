@@ -30,7 +30,8 @@ struct TabataApp: App {
                         }
                     }
             } else {
-                ContentView()
+                let config = Configuration().read()
+                ContentView(configuration: config)
             }
         }
     }

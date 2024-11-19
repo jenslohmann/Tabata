@@ -9,8 +9,11 @@ struct ContentView: View {
     @State private var isTimerRunning = false
     @State private var secondsPassed = 0.0
     @State private var nextSession = 0.0
-    @State private var beepOnly = false
     private var play = SoundPlayer()
+    
+    init(configuration: Configuration) {
+        play.beepOnly = configuration.beepOnly
+    }
     
     var body: some View {
         TabView {
@@ -247,6 +250,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(configuration: Configuration())
     }
 }
